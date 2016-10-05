@@ -97,6 +97,10 @@ namespace r2ree {
 
           if (path[i] == slash) {
             root = root->insert_child(slash, new radix_tree_node(path.substr(i, 1)));
+
+            if (i == 0 && path[i + 1] == 0)
+              break;
+
             ++i;
           }
 
