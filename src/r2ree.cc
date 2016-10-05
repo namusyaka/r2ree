@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2016 namusyaka
+ * Copyright (c) 2016 namusyaka, shiyanhui
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -97,6 +97,10 @@ namespace r2ree {
 
           if (path[i] == slash) {
             root = root->insert_child(slash, new radix_tree_node(path.substr(i, 1)));
+
+            if (i == 0 && path[i + 1] == 0)
+              break;
+
             ++i;
           }
 
