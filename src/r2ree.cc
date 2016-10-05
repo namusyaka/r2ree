@@ -30,11 +30,6 @@ namespace r2ree {
     return i == -1 ? str.size() : i;
   }
 
-  request::request(const string &path, const string &method) {
-    this->path   = path;
-    this->method = method;
-  }
-
   radix_tree_node::radix_tree_node(const string &path) {
     this->id   = -1;
     this->leaf = false;
@@ -44,23 +39,6 @@ namespace r2ree {
   radix_tree_node::~radix_tree_node() {
     for (auto &c : this->children)
       delete c;
-  }
-
-  handle_func radix_tree_node::get_handler(const string &method) {
-    for (auto &h : this->handlers)
-      if (h.method == method)
-        return h.handler;
-    return nullptr;
-  }
-
-  int radix_tree_node::add_handler(handle_func _handler, const vector<string> &methods) {
-    for (auto &m : methods) {
-      auto old_handler = this->get_handler(m);
-      if (old_handler && old_handler != _handler)
-        return -1;
-      this->handlers.push_back(handler{m, _handler});
-    }
-    return 0;
   }
 
   radix_tree_node* radix_tree_node::insert_child(char index, radix_tree_node *child) {
@@ -96,7 +74,7 @@ namespace r2ree {
     delete this->root;
   }
 
-  int radix_tree::insert(const string &path, handle_func _handler, const vector<string> &methods) {
+  int radix_tree::insert(const string &path) {
     auto root = this->root;
     int i = 0, n = path.size(), param_count = 0, code = 0, cid = ++this->cid;
 
@@ -129,7 +107,6 @@ namespace r2ree {
             ++param_count;
           }
 
-          code = root->add_handler(_handler, methods);
           break;
         }
 
@@ -139,10 +116,8 @@ namespace r2ree {
         root = root->insert_child(colon, new radix_tree_node(path.substr(p + 1, i - p - 1)));
         ++param_count;
 
-        if (i == n) {
-          code = root->add_handler(_handler, methods);
+        if (i == n)
           break;
-        }
       } else {
         root = child;
 
@@ -150,10 +125,8 @@ namespace r2ree {
           ++param_count;
           i += root->path.size() + 1;
 
-          if (i == n) {
-            code = root->add_handler(_handler, methods);
+          if (i == n)
             break;
-          }
         } else {
           auto j = 0UL, m = root->path.size();
 
@@ -163,20 +136,16 @@ namespace r2ree {
           if (j < m) {
             auto child = new radix_tree_node(root->path.substr(j));
 
-            child->handlers = root->handlers;
             child->indices = root->indices;
             child->children = root->children;
 
             root->path = root->path.substr(0, j);
-            root->handlers = {};
             root->indices = child->path[0];
             root->children = {child};
           }
 
-          if (i == n) {
-            code = root->add_handler(_handler, methods);
+          if (i == n)
             break;
-          }
         }
       }
     }
@@ -189,7 +158,7 @@ namespace r2ree {
     return code;
   }
 
-  parse_result radix_tree::get(const string &path, const string &method) {
+  parse_result radix_tree::get(const string &path) {
     parameters params = parameters{ new parameter[root->max_parameters] };
 
     auto root = this->root;
@@ -215,6 +184,6 @@ namespace r2ree {
         i += root->path.size();
       }
     }
-    return parse_result{true, root->id, root->get_handler(method), params, root->leaf};
+    return parse_result{true, root->id, params, root->leaf};
   }
 }  // namespace r2ree
