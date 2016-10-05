@@ -54,4 +54,23 @@ namespace {
     ASSERT_EQ(0,    std::get<2>(actual).size);
     ASSERT_EQ(true, std::get<3>(actual));
   }
+
+  TEST_F(r2ree_test, get_with_captured_params) {
+    r2ree::parse_result actual;
+    r2ree::parameters params;
+
+    tree.insert("/users/:name/tags/:tag_id");
+
+    actual = tree.get("/users/namusyaka/tags/foo");
+    params = std::get<2>(actual);
+
+    ASSERT_EQ(true,        std::get<0>(actual));
+    ASSERT_EQ(0,           std::get<1>(actual));
+    ASSERT_EQ(2,           params.size);
+    ASSERT_EQ("name",      params.params[0].first);
+    ASSERT_EQ("namusyaka", params.params[0].second);
+    ASSERT_EQ("tag_id",    params.params[1].first);
+    ASSERT_EQ("foo",       params.params[1].second);
+    ASSERT_EQ(true,        std::get<3>(actual));
+  }
 }
