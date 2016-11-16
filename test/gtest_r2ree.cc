@@ -73,4 +73,21 @@ namespace {
     ASSERT_EQ("foo",       params.params[1].second);
     ASSERT_EQ(true,        std::get<3>(actual));
   }
+
+  TEST_F(r2ree_test, get_with_splat) {
+    r2ree::parse_result actual;
+    r2ree::parameters params;
+
+    tree.insert("/splat/*");
+
+    actual = tree.get("/splat/boofoowoo");
+    params = std::get<2>(actual);
+
+    ASSERT_EQ(true,        std::get<0>(actual));
+    ASSERT_EQ(0,           std::get<1>(actual));
+    ASSERT_EQ(1,           params.size);
+    ASSERT_EQ("",          params.params[0].first);
+    ASSERT_EQ("boofoowoo", params.params[0].second);
+    ASSERT_EQ(true,        std::get<3>(actual));
+  }
 }
