@@ -20,7 +20,7 @@ set(EXT_PROJECTS_DIR ${PROJECT_SOURCE_DIR}/ext)
 
 add_subdirectory(${EXT_PROJECTS_DIR}/gtest)
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++ -Iinclude -include ${PROJECT_SOURCE_DIR}/src/r2ree.cc")
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CXX_FLAGS} -Iinclude -include ${PROJECT_SOURCE_DIR}/src/r2ree.cc")
 
 #-------------------
 # Test
