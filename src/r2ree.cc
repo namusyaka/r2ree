@@ -163,14 +163,16 @@ namespace r2ree {
   }
 
   parse_result radix_tree::get(const string &path) {
-    parameters params = parameters{ new parameter[root->max_parameters] };
+    parameters params = parameters{ new parameter[root->max_parameters], 0};
 
     auto root = this->root;
     int i = 0, n = path.size(), p;
 
     while (i < n) {
-      if (root->indices.empty())
+      if (root->indices.empty()) {
+        delete[] params.params;
         return parse_result();
+      }
 
       if (root->indices[0] == colon) {
         root = root->children[0];
@@ -183,8 +185,10 @@ namespace r2ree {
         break;
       } else {
         root = root->get_child(path[i]);
-        if (!root || path.substr(i, root->path.size()) != root->path)
+        if (!root || path.substr(i, root->path.size()) != root->path) {
+          delete[] params.params;
           return parse_result();
+        }
         i += root->path.size();
       }
     }
